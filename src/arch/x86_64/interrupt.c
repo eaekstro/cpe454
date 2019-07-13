@@ -9,10 +9,12 @@
 #include "ps2.h"
 #include "isr.h"
 #include "segment.h"
+#include "serial.h"
 
 extern int printk(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 void c_intr_handler(int irq, int errorCode) {
+   /*printk("C HANDLER: %d\n", irq);*/
    if (irq_table[irq].handler)
       (*irq_table[irq].handler)(0, 0, irq_table[irq].arg);
    else
@@ -26,6 +28,10 @@ void keyboard_interrupt() {
       printk("%c", ch);
 }
 
+void serial_interrupt() {
+   set_idle(1);
+   /*SER_write(0, 0);*/
+}
 
 void IRQ_set_handler(int irq, irq_handler_t handler, void *arg) {
    irq_table[irq].handler = handler;
@@ -44,10 +50,8 @@ void IRQ_init(void) {
    CLI();
    PIC_remap(0x20, 0x28);
    /*(*isr_table[0])();*/
-
-   for (i=0; i < NUM_IRQS; i++) {
-      if (i != 1)
-         IRQ_set_mask(i);
+   
+   for (i = 0; i < NUM_IRQS; i++) {
       idt_table[i].offset1 =  (uintptr_t) isr_table[i]        & 0xFFFF;
       idt_table[i].offset2 = ((uintptr_t) isr_table[i] >> 16) & 0xFFFF;
       idt_table[i].offset3 = ((uintptr_t) isr_table[i] >> 32) & 0xFFFFFFFF;
@@ -59,8 +63,15 @@ void IRQ_init(void) {
       idt_table[i].type = 0xE;
       IRQ_set_handler(i, 0, 0);
    }
+   IRQ_set_mask(0);
+   for (i = 1; i < 16; i++) {
+      IRQ_clear_mask(i);
+   }
+
    lidt(idt_table, NUM_IRQS*sizeof(idt_entry));
    IRQ_set_handler(33, keyboard_interrupt, (void *) PS2_DATA_PORT);
+   IRQ_set_handler(36, serial_interrupt, (void *) SERIAL_PORT);
+
    
    tss_table.ist1 = (uint64_t) df_stack + STACK_SIZE - 1;
    tss_table.ist2 = (uint64_t) pf_stack + STACK_SIZE - 1;
@@ -118,17 +129,17 @@ void IRQ_set_mask(unsigned char IRQline) {
 }
 
 void IRQ_clear_mask(unsigned char IRQline) {
-    uint16_t port;
-    uint8_t value;
- 
-    if(IRQline < 8) {
-        port = PIC1_DATA;
-    } else {
-        port = PIC2_DATA;
-        IRQline -= 8;
-    }
-    value = inb(port) & ~(1 << IRQline);
-    outb(value, port);        
+   uint16_t port;
+   uint8_t value;
+
+   if(IRQline < 8) {
+     port = PIC1_DATA;
+   } else {
+     port = PIC2_DATA;
+     IRQline -= 8;
+   }
+   value = inb(port) & ~(1 << IRQline);
+   outb(value, port);        
 }
 
 int IRQ_get_mask(int IRQline) {
@@ -145,20 +156,20 @@ int IRQ_get_mask(int IRQline) {
 
 /* Helper func */
 static uint16_t __pic_get_irq_reg(int ocw3) {
-    /* OCW3 to PIC CMD to get the register values.  PIC2 is chained, and
-     * represents IRQs 8-15.  PIC1 is IRQs 0-7, with 2 being the chain */
-    outb(ocw3, PIC1_COMMAND);
-    outb(ocw3, PIC2_COMMAND);
-    return (inb(PIC2_COMMAND) << 8) | inb(PIC1_COMMAND);
+   /* OCW3 to PIC CMD to get the register values.  PIC2 is chained, and
+    * represents IRQs 8-15.  PIC1 is IRQs 0-7, with 2 being the chain */
+   outb(ocw3, PIC1_COMMAND);
+   outb(ocw3, PIC2_COMMAND);
+   return (inb(PIC2_COMMAND) << 8) | inb(PIC1_COMMAND);
 }
 
 /* Returns the combined value of the cascaded PICs irq request register */
 uint16_t pic_get_irr(void) {
-    return __pic_get_irq_reg(PIC_READ_IRR);
+   return __pic_get_irq_reg(PIC_READ_IRR);
 }
 
 /* Returns the combined value of the cascaded PICs in-service register */
 uint16_t pic_get_isr(void) {
-    return __pic_get_irq_reg(PIC_READ_ISR);
+   return __pic_get_irq_reg(PIC_READ_ISR);
 }
 

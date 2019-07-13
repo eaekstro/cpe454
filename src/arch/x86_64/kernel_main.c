@@ -11,6 +11,7 @@
 #include "ps2.h"
 #include "interrupt.h"
 #include "segment.h"
+#include "serial.h"
 
 int kernel_main() {
    int loop = 0;
@@ -20,11 +21,13 @@ int kernel_main() {
    keyboard_init();
    
    IRQ_init();
+   SER_init();
 
    /*while(9) {
       if ((ch = get_ascii()))
          printk("%c", ch);
    }*/
+   SER_write("asdfasdfasdfasdfas", 18);
    while (!loop);
 
    return 1;

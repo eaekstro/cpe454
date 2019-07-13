@@ -7,6 +7,7 @@
  ***************************************************************************/
 
 #include "vga_display.h"
+#include "serial.h"
 
 static unsigned short *vgaBuff = (unsigned short *) VGA_BASE;
 static int width  = 80;
@@ -81,6 +82,7 @@ void VGA_display_char(char ch) {
          cursor++;
    }
    vgaBuff[cursor] = (curscol << 8) | '\0';
+   /*SER_write(&ch, 1);*/
 
    if (enable_ints)
       STI();

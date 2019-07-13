@@ -6,21 +6,26 @@
  * VGA display functions
  ***************************************************************************/
 
-#include <stdbool.h>
-#include "assem.h"
+#ifndef VGA_DISPLAY_H
+#define VGA_DISPLAY_H
 
-#define VGA_BASE  0xb8000
-#define VGA_RED   0x4
-#define VGA_WHITE 0xF
-#define VGA_BLACK 0x0
-#define VGA_GREY  0x7
+   #include <stdbool.h>
+   #include "assem.h"
 
-#define FG(x)     x
-#define BG(x)     x << 4
-#define LINE(x)   (x / 80)
+   #define VGA_BASE  0xb8000
+   #define VGA_RED   0x4
+   #define VGA_WHITE 0xF
+   #define VGA_BLACK 0x0
+   #define VGA_GREY  0x7
 
-/*extern void *memset(void *dst, int c, int n);*/
+   #define FG(x)     x
+   #define BG(x)     x << 4
+   #define LINE(x)   (x / 80)
 
-void VGA_clear(void);
-void VGA_display_char(char ch);
-void VGA_display_str(const char *chPtr);
+   /*extern void *memset(void *dst, int c, int n);*/
+
+   void VGA_clear(void);
+   void VGA_display_char(char ch);
+   void VGA_display_str(const char *chPtr);
+
+#endif
