@@ -7,6 +7,7 @@
  ***************************************************************************/
 
 #include <stdarg.h>
+#include "memman.h"
 #include "serial.h"
 
 #define MAX_ULONG_DIGITS   20
@@ -31,12 +32,9 @@ void print_hex_num(unsigned long long num);
 
 int printk(const char *fmt, ...) {
    va_list argp;
-   /*int len = 0;
-   char *chPtr = fmt;
-   while (*chPtr++ != '\0')
-      len++;
+   int len = 0;
    
-   SER_write(fmt, len);*/
+   SER_write(fmt, strlen(fmt));
    va_start(argp, fmt);
    while (*fmt != '\0') {
       if (*fmt == '%') {

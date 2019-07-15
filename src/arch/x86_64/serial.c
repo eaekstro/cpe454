@@ -13,7 +13,7 @@ static void init_state(struct State *state);
 static uint8_t is_transmit_empty();
 static void consume_byte(char ch);
 static void consumer_next(struct State *state);
-static void producer_add_char(char toAdd, struct State *state);
+static int producer_add_char(char toAdd, struct State *state);
 static struct State initState;
 static uint8_t serial_idle = 1;
 
@@ -36,21 +36,24 @@ inline void set_idle(uint8_t val) {
 }
 
 int SER_write(const char *buff, int len) {
-   int i;
-   /*static struct State state;*/
+   int i, loop = 0;
    if (is_transmit_empty() == 0)
       serial_idle = 0;
    else
       serial_idle = 1;
+
    for (i = 0; i < len; i++) {
-      producer_add_char(buff[i], &initState);
-      if (initState.head == initState.tail - 1 || 
-            (initState.head == &initState.buff[BUFF_SIZE - 1] 
-            && initState.tail == &initState.buff[0]) ) {
+      if (producer_add_char(buff[i], &initState) && serial_idle) {
          CLI();
          consumer_next(&initState);
          STI();
       }
+   }
+
+   if (serial_idle) {
+      CLI();
+      consumer_next(&initState);
+      STI();
    }
 
    return 0;
@@ -66,9 +69,7 @@ static uint8_t is_transmit_empty() {
 }
 
 static void consume_byte(char ch) {
-   /*while (is_transmit_empty() == 0);*/
    serial_idle = 0;
-   /*printk("consuming %c\n", ch);*/
    outb(ch, SERIAL_PORT);
 }
 
@@ -76,23 +77,23 @@ static void consumer_next(struct State *state) {
    if (state->head == state->tail)
       return;
 
-   if (serial_idle)
-      consume_byte(*state->head++);
+   consume_byte(*state->head++);
    if (state->head >= &state->buff[BUFF_SIZE])
       state->head = &state->buff[0];
    /*printk("\nHEAD: %d; TAIL: %d\n", (int) (state->head - &state->buff[0]), (int)(state->tail - &state->buff[0]));*/
 }
 
-static void producer_add_char(char toAdd, struct State *state) {
+static int producer_add_char(char toAdd, struct State *state) {
    if (state->head - 1 == state->tail || 
          (state->head == &state->buff[0] && state->tail == &state->buff[BUFF_SIZE - 1]) )
-      return;
+      return 1;
    
-   /*printk("adding %c\n", toAdd);*/
    *state->tail++ = toAdd;
    if (state->tail >= &state->buff[BUFF_SIZE])
       state->tail = &state->buff[0];
    /*printk("\nHEAD: %d; TAIL: %d\n", (int) (state->head - &state->buff[0]), (int)(state->tail - &state->buff[0]));*/
+
+   return 0;
 }
 
 

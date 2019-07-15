@@ -38,9 +38,7 @@ int ps2_init(void) {
    ps2_poll_write(configByte, PS2_DATA_PORT);
    /*ps2_poll_write(ENABLE_PORT1, PS2_CMD_PORT);*/
    ps2_poll_write(0xAA, PS2_CMD_PORT);
-   if (ps2_poll_read() == 0x55)
-      printk("ps2 test OK\n");
-   else
+   if (ps2_poll_read() != 0x55)
       printk("ps2 test FAILED\n");
    /*ps2_poll_write(READ_CONFIG, PS2_CMD_PORT);
    configByte = ps2_poll_read();
@@ -54,9 +52,7 @@ int keyboard_init(void) {
    while(j);*/
    ps2_poll_write(RESET_KB, PS2_DATA_PORT);
    check_status();
-   if (ps2_poll_read() == RESET_OK)
-      printk("KB reset OK\n");
-   else
+   if (ps2_poll_read() != RESET_OK)
       printk("KB reset FAILED\n");
 
    ps2_poll_write(SET_SCAN_CODE, PS2_DATA_PORT);
@@ -74,8 +70,8 @@ void check_status(void) {
    unsigned char status;
    if ((status = ps2_poll_read()) == RESEND_ACK)
       printk("resend\n");
-   else if (status == OK_ACK)
-      printk("OK\n");
+   else if (status != OK_ACK)
+      printk("status not OK\n");
 }
 
 char get_ascii() {

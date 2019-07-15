@@ -19,15 +19,18 @@ int kernel_main() {
    segment_init();
    ps2_init();
    keyboard_init();
-   
    IRQ_init();
    SER_init();
+   
 
    /*while(9) {
       if ((ch = get_ascii()))
          printk("%c", ch);
    }*/
-   SER_write("asdfasdfasdfasdfas", 18);
+   printk("asdfasdfasdfasdfas\n");
+   printk("blah blah blah\n");
+   printk("ANOTHER ");
+   printk("MOTHA LICKA\n");
    while (!loop);
 
    return 1;

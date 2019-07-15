@@ -15,7 +15,7 @@
    return dst;
 }*/
 
-int strLen(const char *chPtr) {
+int strlen(const char *chPtr) {
    int len = 0;
    while (*chPtr++ != '\0')
       len++;
