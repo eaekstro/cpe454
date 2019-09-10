@@ -53,6 +53,8 @@ file.write(" *\n")
 file.write(" * ISR C Interface\n")
 file.write(" ***************************************************************/\n\n")
 
+file.write("#ifndef ISR_H\n#define ISR_H\n\n")
+
 file.write("#include \"interrupt.h\"\n\n");
 
 for i in range(256):
@@ -65,4 +67,6 @@ for i in range(256):
    else:
       file.write("\tISR{}\n".format(i))
 
-file.write("};")
+file.write("};\n\n")
+
+file.write("#endif")

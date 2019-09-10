@@ -12,8 +12,9 @@
 #include "interrupt.h"
 #include "segment.h"
 #include "serial.h"
+#include "memman.h"
 
-int kernel_main() {
+int kernel_main(unsigned long magic, unsigned long addr) {
    int loop = 0;
    
    segment_init();
@@ -21,7 +22,7 @@ int kernel_main() {
    keyboard_init();
    IRQ_init();
    SER_init();
-   
+   parse_multiboot(magic, addr);
 
    /*while(9) {
       if ((ch = get_ascii()))
@@ -29,8 +30,6 @@ int kernel_main() {
    }*/
    printk("asdfasdfasdfasdfas\n");
    printk("blah blah blah\n");
-   printk("ANOTHER ");
-   printk("MOTHA LICKA\n");
    while (!loop);
 
    return 1;

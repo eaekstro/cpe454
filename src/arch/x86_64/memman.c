@@ -1,24 +1,27 @@
 /****************************************************************************
  * Eric Ekstrom
  * CPE454
- * 2019-04-11
+ * 2019-09-09
  *
  * Memory manager functions
  ***************************************************************************/
 
-/*void *memset(void *dst, int c, int n) {
-   unsigned char *ptr;
-   int i;
-   for (i = 0; i < n; i++)
-      ptr[i] = c;
+#include "memman.h"
 
-   return dst;
-}*/
+extern int printk(const char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
-int strlen(const char *chPtr) {
-   int len = 0;
-   while (*chPtr++ != '\0')
-      len++;
+void parse_multiboot(unsigned long magic, unsigned long addr) {
+   multiboot_tag *tag;
+   if (magic != MULTIBOOT_MAGIC) {
+      printk("invalid magic: %lx\n", magic);
+      return;
+   }
+   printk("Tag starting at addr %lx\n", addr);
 
-   return len;
+   for (tag = (multiboot_tag *) (addr + 8); tag->type != 0 && tag->size != 8;
+        tag = (multiboot_tag *) ((uint8_t *) tag + tag->size)) {
+      if (tag->type == 2)
+         printk("BOOTLOADER: %s", (uint8_t *) tag + 8);
+   }
 }
+

@@ -7,7 +7,7 @@
  ***************************************************************************/
 
 #include <stdarg.h>
-#include "memman.h"
+#include "string.h"
 #include "serial.h"
 
 #define MAX_ULONG_DIGITS   20
@@ -41,7 +41,7 @@ int printk(const char *fmt, ...) {
          ch = fmt[len+1];
          if (len > 0) {
             SER_write(fmt, len);
-            VGA_display_str(fmt);
+            /*VGA_display_str(fmt);*/
          }
          fmt = &fmt[len+2];
          if (ch == '%')
@@ -70,13 +70,15 @@ int printk(const char *fmt, ...) {
       }
       /*else
          VGA_display_char(*fmt);*/
-      else
+      else {
+         VGA_display_char(fmt[len]);
          len++;
+      }
    }
-   /*if (len > 0) {
+   if (len > 0) {
       SER_write(fmt, len);
-      VGA_display_str(fmt);
-   }*/
+      /*VGA_display_str(fmt);*/
+   }
    va_end(argp);
 
    return 1;
