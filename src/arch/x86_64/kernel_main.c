@@ -14,7 +14,7 @@
 #include "serial.h"
 #include "memman.h"
 
-int kernel_main(unsigned long magic, unsigned long addr) {
+int kernel_main(unsigned long addr) {
    int loop = 0;
    
    segment_init();
@@ -22,7 +22,7 @@ int kernel_main(unsigned long magic, unsigned long addr) {
    keyboard_init();
    IRQ_init();
    SER_init();
-   parse_multiboot(magic, addr);
+   parse_multiboot(addr);
 
    /*while(9) {
       if ((ch = get_ascii()))

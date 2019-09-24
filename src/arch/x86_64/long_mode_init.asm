@@ -18,5 +18,7 @@ long_mode_start:
 
     ;push ebx
     ;push eax
+    ;mov eax,rdi
+    mov rdi, rbx
     call kernel_main
     hlt

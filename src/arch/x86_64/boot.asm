@@ -5,6 +5,7 @@ section .text
 bits 32
 start:
     mov esp, stack_top
+    push ebx
 
     call check_multiboot
     call check_cpuid
@@ -16,6 +17,7 @@ start:
     ; load the 64-bit GDT
     lgdt [gdt64.pointer]
 
+    pop ebx
     jmp gdt64.code:long_mode_start
 
     ; print 'OK' to screen
