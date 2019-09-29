@@ -13,6 +13,15 @@
       ptr[i] = c;
 
    return dst;
+}
+
+void *memcpy(void *dest, const void *src, int n) {
+   uint8_t *srcPtr = src, *destPtr = dest;
+   int i;
+   for (i = 0; i < n; i++)
+      destPtr[i] = srcPtr[i];
+
+   return (void *) srcPtr;
 }*/
 
 int strlen(const char *chPtr) {

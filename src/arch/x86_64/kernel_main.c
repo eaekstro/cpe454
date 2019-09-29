@@ -27,9 +27,10 @@ int kernel_main(unsigned long addr) {
    /*while(9) {
       if ((ch = get_ascii()))
          printk("%c", ch);
-   }*/
+   }
    printk("asdfasdfasdfasdfas\n");
    printk("blah blah blah\n");
+   allocate_all_pages();*/
    while (!loop);
 
    return 1;

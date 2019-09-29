@@ -21,6 +21,12 @@
    #define MULTIBOOT_TYPE_MMAP      6
    #define MULTIBOOT_TYPE_ELF       9
 
+   
+   #define NULL (void *) 0
+   
+   #define TRUE  1
+   #define FALSE 0
+
    typedef struct __attribute__ ((__packed__)) mult_tag {
       uint32_t type;
       uint32_t size;
@@ -69,6 +75,16 @@
       uint64_t iff_section;
    } multiboot_elf;
 
+   typedef struct page_allocate page_node;
+   struct __attribute__ ((__packed__)) page_allocate {
+      page_node *prev;
+      page_node *next;
+   };
+
+   
+   void allocate_all_pages(void);
+   void *MMU_pf_alloc(void);
+   void MMU_pf_free(void *pf);
    void parse_multiboot(unsigned long addr);
 
 #endif
