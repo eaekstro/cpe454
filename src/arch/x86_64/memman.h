@@ -81,7 +81,85 @@
       page_node *next;
    };
 
+   typedef struct __attribute__ ((__packed__)) pml4_entry {
+      uint8_t nx:1;
+      
+      uint16_t avail:11;
+
+      uint64_t pdp_base_addr:40;
+
+      uint8_t  avl:3;
+      uint8_t  mbz:2;
+      uint8_t  ign:1;
+      uint8_t  a:1;
+      uint8_t  pcd:1;
+      
+      uint8_t  pwt:1;
+      uint8_t  user_super:1;
+      uint8_t  read_write:1;
+      uint8_t  present:1;
+   } PML4_entry;
    
+   typedef struct __attribute__ ((__packed__)) pdp_entry {
+      uint8_t nx:1;
+      
+      uint16_t avail:11;
+
+      uint64_t pd_base_addr:40;
+
+      uint8_t  avl:3;
+      uint8_t  mbz:1;
+      uint8_t  zero:1;
+      uint8_t  ign:1;
+      uint8_t  a:1;
+      uint8_t  pcd:1;
+      
+      uint8_t  pwt:1;
+      uint8_t  user_super:1;
+      uint8_t  read_write:1;
+      uint8_t  present:1;
+   } PDP_entry;
+
+   typedef struct __attribute__ ((__packed__)) pd_entry {
+      uint8_t nx:1;
+      
+      uint16_t avail:11;
+
+      uint64_t pt_base_addr:40;
+
+      uint8_t  avl:3;
+      uint8_t  ign1:1;
+      uint8_t  zero:1;
+      uint8_t  ign2:1;
+      uint8_t  a:1;
+      uint8_t  pcd:1;
+      
+      uint8_t  pwt:1;
+      uint8_t  user_super:1;
+      uint8_t  read_write:1;
+      uint8_t  present:1;
+   } PD_entry;
+
+   typedef struct __attribute__ ((__packed__)) pt_entry {
+      uint8_t nx:1;
+      
+      uint16_t avail:11;
+
+      uint64_t base_addr:40;
+
+      uint8_t  avl:3;
+      uint8_t  g:1;
+      uint8_t  pat:1;
+      uint8_t  d:1;
+      uint8_t  a:1;
+      uint8_t  pcd:1;
+      
+      uint8_t  pwt:1;
+      uint8_t  user_super:1;
+      uint8_t  read_write:1;
+      uint8_t  present:1;
+   } PT_entry;
+
    void allocate_all_pages(void);
    void *MMU_pf_alloc(void);
    void MMU_pf_free(void *pf);
